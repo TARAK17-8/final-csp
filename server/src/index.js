@@ -30,8 +30,13 @@ const PORT = process.env.PORT || 3001;
 
 // ── Security ──
 app.use(helmet());
+const allowedOrigins = [process.env.CLIENT_URL, 'https://samaramai.netlify.app', 'https://smaramai.netlify.app', 'http://localhost:5173'].filter(Boolean);
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:5173',
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+    return callback(new Error('CORS policy: origin not allowed'));
+  },
   credentials: true,
 }));
 
