@@ -1,5 +1,9 @@
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const newTeKeys = {
   'symptom.frontView': 'ముందు వీక్షణ',
@@ -27,7 +31,7 @@ const newTeKeys = {
   'symptom.assessment.disclaimer': 'నిరాకరణ:',
 };
 
-const i18nDir = 'c:/CLAUDE CSP/samaramai/client/src/i18n';
+const i18nDir = path.resolve(__dirname, '../src/i18n');
 const p = path.join(i18nDir, 'te.ts');
 let content = fs.readFileSync(p, 'utf8');
 

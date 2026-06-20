@@ -1,5 +1,9 @@
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const langs = [
   { code: 'hi', name: 'Hindi' },
@@ -9,7 +13,7 @@ const langs = [
   { code: 'ml', name: 'Malayalam' },
 ];
 
-const basePath = 'c:\\\\CLAUDE CSP\\\\samaramai\\\\client\\\\src\\\\i18n';
+const basePath = path.resolve(__dirname, '../src/i18n');
 
 const enObject = {
   "features.symptomChecker.badge": "AI Symptom Checker",

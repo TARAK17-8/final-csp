@@ -41,49 +41,58 @@ class SpeechSynthesisService {
     // Stop any ongoing speech
     this.cancel();
 
-    const utterance = new SpeechSynthesisUtterance(text);
-    
-    // Apply preferences
-    utterance.rate = voiceState.speed;
-    
-    // Find best voice
-    const availableVoices = this.getVoicesForLanguage(langCode);
-    if (voiceState.voiceURI) {
-      const preferred = this.voices.find(v => v.voiceURI === voiceState.voiceURI);
-      if (preferred) utterance.voice = preferred;
-    } else if (availableVoices.length > 0) {
-      // Pick a default voice for the language (Google voices are usually better)
-      const googleVoice = availableVoices.find(v => v.name.includes('Google'));
-      utterance.voice = googleVoice || availableVoices[0];
-    }
+    // Split text into smaller chunks to prevent browser TTS from stopping at paragraphs or timeouts
+    const chunks = text
+      .split(/\n+/)
+      .reduce((acc: string[], curr: string) => acc.concat(curr.split(/(?<=[.!?])\s+/)), [])
+      .map(c => c.trim())
+      .filter(c => c.length > 0);
 
-    utterance.onstart = () => {
-      // Use ai_speaking state — this prevents the mic from activating
-      useVoiceStore.getState().setState('ai_speaking');
-    };
+    if (chunks.length === 0) return;
 
-    utterance.onend = () => {
-      const state = useVoiceStore.getState();
-      if (state.state === 'ai_speaking') {
-        state.setState('idle');
-        // Resume continuous listening if enabled — with a delay to prevent echo
-        if (state.isContinuousMode) {
-          setTimeout(() => {
-            window.dispatchEvent(new Event('resume-listening'));
-          }, 400);
-        }
+    // Use ai_speaking state
+    useVoiceStore.getState().setState('ai_speaking');
+
+    chunks.forEach((chunk, index) => {
+      const utterance = new SpeechSynthesisUtterance(chunk);
+      
+      utterance.rate = voiceState.speed;
+      utterance.lang = langCode;
+      
+      const availableVoices = this.getVoicesForLanguage(langCode);
+      if (voiceState.voiceURI) {
+        const preferred = this.voices.find(v => v.voiceURI === voiceState.voiceURI);
+        if (preferred) utterance.voice = preferred;
+      } else if (availableVoices.length > 0) {
+        const googleVoice = availableVoices.find(v => v.name.includes('Google'));
+        utterance.voice = googleVoice || availableVoices[0];
       }
-    };
 
-    utterance.onerror = (e) => {
-      console.error('Speech synthesis error:', e);
-      const state = useVoiceStore.getState();
-      if (state.state === 'ai_speaking') {
-        state.setState('idle');
+      if (index === chunks.length - 1) {
+        utterance.onend = () => {
+          const state = useVoiceStore.getState();
+          if (state.state === 'ai_speaking') {
+            state.setState('idle');
+            // Resume continuous listening if enabled
+            if (state.isContinuousMode) {
+              setTimeout(() => {
+                window.dispatchEvent(new Event('resume-listening'));
+              }, 400);
+            }
+          }
+        };
+
+        utterance.onerror = (e) => {
+          console.error('Speech synthesis error:', e);
+          const state = useVoiceStore.getState();
+          if (state.state === 'ai_speaking') {
+            state.setState('idle');
+          }
+        };
       }
-    };
 
-    this.synth.speak(utterance);
+      this.synth.speak(utterance);
+    });
   }
 
   public cancel() {

@@ -8,12 +8,14 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowLeft, Upload, FileText, FlaskConical, Pill,
-  Calendar, Camera, Eye, Trash2, Plus, Search,
+  Calendar, Camera, Eye, Trash2, Plus, Search, Volume2,
 } from 'lucide-react';
 import { staggerContainer, fadeInUp } from '@/lib/animations';
 import api from '@/lib/api';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useAuthStore } from '@/stores/authStore';
+import { useVoiceStore } from '@/stores/voiceStore';
+import { speechSynthesizer } from '@/lib/voice/SpeechSynthesis';
 import { db } from '@/lib/firebase';
 import { collection, addDoc, getDocs, query, orderBy, Timestamp, deleteDoc, doc } from 'firebase/firestore';
 import { uploadToCloudinary } from '@/lib/cloudinary';
@@ -52,9 +54,29 @@ const typeLabels = {
   vaccination: 'VACCINATION',
 };
 
+const MOCK_RECORDS: HealthRecord[] = [
+  {
+    id: 'mock-1',
+    type: 'prescription',
+    title: 'Dr. Agrawal Health Checkup',
+    date: new Date().toISOString().split('T')[0],
+    hospital: 'Agrawal Clinic',
+    summary: 'General health checkup prescription. Take Paracetamol 500mg twice daily after meals.',
+  },
+  {
+    id: 'mock-2',
+    type: 'lab_report',
+    title: 'Complete Blood Count (CBC)',
+    date: new Date(Date.now() - 86400000 * 3).toISOString().split('T')[0],
+    hospital: 'City Diagnostics',
+    summary: 'All parameters normal. Hemoglobin is slightly low, consider iron supplements.',
+  }
+];
+
 export default function HealthRecordsPage() {
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
+  const { state: voiceState } = useVoiceStore();
   const { user, isAuthenticated } = useAuthStore();
   const [records, setRecords] = useState<HealthRecord[]>([]);
   const [loading, setLoading] = useState(true);
@@ -67,6 +89,7 @@ export default function HealthRecordsPage() {
   // Load records from Firestore
   const loadRecords = useCallback(async () => {
     if (!isAuthenticated || !user?.uid) {
+      setRecords(MOCK_RECORDS);
       setLoading(false);
       return;
     }
@@ -86,9 +109,14 @@ export default function HealthRecordsPage() {
           publicId: data.publicId,
         };
       });
-      setRecords(items);
+      if (items.length === 0) {
+        setRecords(MOCK_RECORDS);
+      } else {
+        setRecords(items);
+      }
     } catch (err) {
       console.error('Failed to load records:', err);
+      setRecords(MOCK_RECORDS);
     } finally {
       setLoading(false);
     }
@@ -115,16 +143,30 @@ export default function HealthRecordsPage() {
     }
   };
 
+  const handleListen = useCallback((record: HealthRecord) => {
+    if (voiceState === 'ai_speaking') {
+      speechSynthesizer.cancel();
+      return;
+    }
+    const text = `${typeLabels[record.type]}. ${record.title}. ${record.summary ? record.summary : ''}`;
+    speechSynthesizer.speak(text, language);
+  }, [voiceState, language]);
+
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file || !user?.uid) return;
+    if (!file) return;
 
     setUploading(true);
     setUploadResult(null);
 
     try {
-      // 1. Upload to Cloudinary
-      const cloudinaryResponse = await uploadToCloudinary(file, 'samaramai/reports');
+      // 1. Upload to Cloudinary (optional if unauthenticated, but we try)
+      let cloudinaryResponse = { secure_url: '', public_id: '' };
+      try {
+        cloudinaryResponse = await uploadToCloudinary(file, 'samaramai/reports');
+      } catch (err) {
+        console.warn('Cloudinary upload failed, proceeding with base64 for AI', err);
+      }
       
       // 2. Read as base64 for AI Processing
       const reader = new FileReader();
@@ -132,29 +174,31 @@ export default function HealthRecordsPage() {
         const base64 = (reader.result as string).split(',')[1];
         try {
           // 3. Get AI Analysis
-          const response = await api.post('/prescription/translate', { image: base64 });
+          const response = await api.post('/prescription-translator/translate', { image: base64, language });
           const aiData = response.data.data;
           setUploadResult(aiData);
 
-          // 4. Save metadata to Firestore
-          let summary = '';
-          if (aiData.medicines && aiData.medicines.length > 0) {
-            summary = aiData.medicines.map((m: any) => m.name).join(', ');
+          // 4. Save metadata to Firestore only if authenticated
+          if (user?.uid) {
+            let summary = aiData.explanation || '';
+            if (!summary && aiData.medicineTable && aiData.medicineTable.length > 0) {
+              summary = aiData.medicineTable.map((m: any) => m.medicineName).join(', ');
+            }
+
+            const recordsRef = collection(db, 'users', user.uid, 'reports');
+            await addDoc(recordsRef, {
+              imageUrl: cloudinaryResponse.secure_url,
+              publicId: cloudinaryResponse.public_id,
+              uploadedAt: Timestamp.now(),
+              fileType: file.type,
+              originalFileName: file.name,
+              recordType: 'prescription',
+              aiSummary: summary,
+            });
+
+            // Refresh records list
+            loadRecords();
           }
-
-          const recordsRef = collection(db, 'users', user.uid, 'reports');
-          await addDoc(recordsRef, {
-            imageUrl: cloudinaryResponse.secure_url,
-            publicId: cloudinaryResponse.public_id,
-            uploadedAt: Timestamp.now(),
-            fileType: file.type,
-            originalFileName: file.name,
-            recordType: 'prescription',
-            aiSummary: summary,
-          });
-
-          // Refresh records list
-          loadRecords();
         } catch (err) {
           console.error(err);
           setUploadResult({ error: 'Could not process this image via AI, but it was uploaded successfully.' });
@@ -164,8 +208,8 @@ export default function HealthRecordsPage() {
       };
       reader.readAsDataURL(file);
     } catch (err) {
-      console.error('Cloudinary upload failed:', err);
-      setUploadResult({ error: 'Failed to upload image. Please check your connection and Cloudinary settings.' });
+      console.error('Upload process failed:', err);
+      setUploadResult({ error: 'Failed to process image. Please check your connection.' });
       setUploading(false);
     }
   };
@@ -211,16 +255,33 @@ export default function HealthRecordsPage() {
           {uploadResult && !uploadResult.error && (
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="glass" style={{ borderRadius: 'var(--radius-xl)', padding: '1.25rem', marginBottom: '1.5rem' }}>
               <span className="text-label" style={{ color: 'var(--color-teal-400)', fontSize: '0.65rem', display: 'block', marginBottom: '0.75rem' }}>AI TRANSLATION</span>
-              {uploadResult.medicines?.map((med: any, i: number) => (
+              
+              {uploadResult.explanation && (
+                <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: '0.95rem', marginBottom: '1.25rem', lineHeight: 1.6 }}>
+                  {uploadResult.explanation}
+                </p>
+              )}
+
+              {uploadResult.medicineTable?.map((med: any, i: number) => (
                 <div key={i} style={{ padding: '0.75rem 0', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-                  <p style={{ fontWeight: 600, marginBottom: '0.25rem' }}>{med.name} {med.genericName && `(${med.genericName})`}</p>
-                  <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.9rem' }}>{med.plainInstructions}</p>
-                  {med.reminderSchedule?.times && (
-                    <p style={{ color: 'var(--color-teal-400)', fontSize: '0.8rem', marginTop: '0.25rem' }}>⏰ {med.reminderSchedule.times.join(', ')}</p>
+                  <p style={{ fontWeight: 600, marginBottom: '0.25rem' }}>{med.medicineName}</p>
+                  <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.9rem' }}>
+                    {med.dosage} · {med.frequency} · {med.duration}
+                  </p>
+                  {med.specialInstructions && med.specialInstructions !== 'Not specified in prescription' && (
+                    <p style={{ color: 'var(--color-teal-400)', fontSize: '0.85rem', marginTop: '0.25rem' }}>{med.specialInstructions}</p>
                   )}
                 </div>
               ))}
               {uploadResult.generalInstructions && <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.85rem', marginTop: '0.5rem' }}>{uploadResult.generalInstructions}</p>}
+              
+              <button 
+                onClick={() => speechSynthesizer.speak(uploadResult.explanation || uploadResult.translatedText || '', language)} 
+                className="btn-secondary flex items-center justify-center gap-2" 
+                style={{ marginTop: '1rem', width: '100%', borderColor: voiceState === 'ai_speaking' ? 'var(--color-teal-400)' : 'rgba(255,255,255,0.15)', color: voiceState === 'ai_speaking' ? 'var(--color-teal-400)' : 'rgba(255,255,255,0.7)' }}
+              >
+                <Volume2 size={16} /> {voiceState === 'ai_speaking' ? t('common.stop') : t('common.listen')}
+              </button>
             </motion.div>
           )}
         </AnimatePresence>
@@ -258,6 +319,7 @@ export default function HealthRecordsPage() {
                   {record.summary && <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.85rem' }}>{record.summary}</p>}
                 </div>
                 <div className="flex gap-1">
+                  <button onClick={(e) => { e.stopPropagation(); handleListen(record); }} style={{ width: 32, height: 32, borderRadius: 'var(--radius-sm)', background: 'rgba(255,255,255,0.05)', border: 'none', color: voiceState === 'ai_speaking' ? 'var(--color-teal-400)' : 'rgba(255,255,255,0.4)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Volume2 size={14} /></button>
                   {record.imageUrl && (
                     <button onClick={(e) => { e.stopPropagation(); window.open(record.imageUrl, '_blank'); }} style={{ width: 32, height: 32, borderRadius: 'var(--radius-sm)', background: 'rgba(255,255,255,0.05)', border: 'none', color: 'rgba(255,255,255,0.4)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Eye size={14} /></button>
                   )}

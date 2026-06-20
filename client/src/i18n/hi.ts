@@ -45,6 +45,16 @@ const hi: TranslationKeys = {
   'common.signOut': 'साइन आउट',
   'common.skip': 'अभी के लिए छोड़ें',
   'common.upload': 'अपलोड',
+  'common.listen': 'सुनें',
+  'common.stop': 'रुकें',
+
+  // ── Voice ──
+  'voice.listening': 'सुन रहा है...',
+  'voice.processing': 'प्रोसेसिंग...',
+  'voice.sending': 'भेज रहा है...',
+  'voice.speaking': 'बोल रहा है...',
+  'voice.error': 'त्रुटि',
+  'voice.assistant': 'वॉयस असिस्टेंट',
 
   // ── Hero Section ──
   'hero.badge': 'भारत के लिए AI स्वास्थ्य सेवा',
@@ -191,6 +201,21 @@ const hi: TranslationKeys = {
   'medicine.scanInstructions': 'दवा की पट्टी को फ्रेम में रखें',
   'medicine.voiceInput': 'या दवा का नाम बोलें',
   'medicine.reading': 'दवा की जानकारी पढ़ रहे हैं...',
+  'medicine.identity': 'दवा की पहचान',
+  'medicine.manufacturer': 'निर्माता',
+  'medicine.expiry': 'समाप्ति',
+  'medicine.whatItsFor': 'किसके लिए है',
+  'medicine.howToTakeIt': 'कैसे लें',
+  'medicine.seriousSeekHelp': 'गंभीर (मदद लें)',
+  'medicine.doNotTakeWith': 'इसके साथ न लें',
+  'medicine.interactionCheck': 'इंटरैक्शन जांच',
+  'medicine.noConflicts': 'आपकी वर्तमान दवाओं के साथ कोई समस्या नहीं',
+  'medicine.setReminder': 'रीफिल रिमाइंडर सेट करें',
+  'medicine.severeInteraction': 'गंभीर दवा इंटरैक्शन का पता चला',
+  'medicine.callDoctor': 'डॉक्टर को कॉल करें',
+  'medicine.understandRisk': 'मुझे जोखिम समझ आ गया',
+  'medicine.interactionWarning': 'इंटरैक्शन चेतावनी',
+  'medicine.common': 'सामान्य',
 
   // ── Emergency Care ──
   'emergency.title': 'आपातकालीन देखभाल',

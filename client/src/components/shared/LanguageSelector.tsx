@@ -9,7 +9,7 @@ import { SUPPORTED_LANGUAGES } from '@/types/common';
 import { useTranslation } from '@/hooks/useTranslation';
 
 // Primary languages shown at the top
-const PRIMARY_CODES = ['en', 'te', 'hi', 'kn', 'ta'] as const;
+const PRIMARY_CODES = ['en', 'te', 'hi', 'kn', 'ta', 'ml'] as const;
 
 export default function LanguageSelector({ variant = 'navbar' }: { variant?: 'navbar' | 'standalone' }) {
   const { language, setLanguage, t } = useTranslation();
@@ -127,27 +127,6 @@ export default function LanguageSelector({ variant = 'navbar' }: { variant?: 'na
               }}
             />
           ))}
-
-          {/* Divider */}
-          {otherLangs.length > 0 && (
-            <>
-              <div style={{ height: 1, background: 'rgba(255,255,255,0.08)', margin: '0.4rem 0.5rem' }} />
-              <div style={{ padding: '0.4rem 0.75rem 0.25rem', fontSize: '0.65rem', fontWeight: 600, color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
-                {t('langSelector.other')}
-              </div>
-              {otherLangs.map((lang) => (
-                <LanguageOption
-                  key={lang.code}
-                  lang={lang}
-                  isSelected={lang.code === language}
-                  onSelect={async () => {
-                    await setLanguage(lang.code);
-                    setIsOpen(false);
-                  }}
-                />
-              ))}
-            </>
-          )}
         </div>
       )}
     </div>

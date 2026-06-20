@@ -1,5 +1,9 @@
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const newEnKeys = {
   'symptom.frontView': 'Front View',
@@ -36,7 +40,7 @@ const languages = [
 ];
 
 async function updateTranslations() {
-  const i18nDir = 'c:/CLAUDE CSP/samaramai/client/src/i18n';
+  const i18nDir = path.resolve(__dirname, '../src/i18n');
   
   // 1. Update en.ts
   let enContent = fs.readFileSync(path.join(i18nDir, 'en.ts'), 'utf8');

@@ -45,6 +45,16 @@ const en: TranslationKeys = {
   'common.signOut': 'Sign Out',
   'common.skip': 'Skip for now',
   'common.upload': 'Upload',
+  'common.listen': 'Listen',
+  'common.stop': 'Stop',
+
+  // ── Voice ──
+  'voice.listening': 'Listening...',
+  'voice.processing': 'Processing...',
+  'voice.sending': 'Sending...',
+  'voice.speaking': 'Speaking...',
+  'voice.error': 'Error',
+  'voice.assistant': 'Voice Assistant',
 
   // ── Hero Section ──
   'hero.badge': 'AI-Powered Healthcare for India',
@@ -192,6 +202,21 @@ const en: TranslationKeys = {
   'medicine.scanInstructions': 'Align medicine strip within the frame',
   'medicine.voiceInput': 'Or speak the medicine name',
   'medicine.reading': 'Reading medicine information...',
+  'medicine.identity': 'Medicine Identity',
+  'medicine.manufacturer': 'Mfr',
+  'medicine.expiry': 'Exp',
+  'medicine.whatItsFor': 'What it\u2019s for',
+  'medicine.howToTakeIt': 'How to take it',
+  'medicine.seriousSeekHelp': 'Serious (seek help)',
+  'medicine.doNotTakeWith': 'Do Not Take With',
+  'medicine.interactionCheck': 'Interaction Check',
+  'medicine.noConflicts': 'No conflicts with your current medicines',
+  'medicine.setReminder': 'Set Refill Reminder',
+  'medicine.severeInteraction': 'Severe Drug Interaction Detected',
+  'medicine.callDoctor': 'Call My Doctor',
+  'medicine.understandRisk': 'I understand the risk',
+  'medicine.interactionWarning': 'Interaction Warning',
+  'medicine.common': 'Common',
 
   // ── Features Showcase ──
   'features.symptomChecker.badge': 'AI Symptom Checker',

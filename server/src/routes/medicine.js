@@ -9,6 +9,12 @@ import { askGroq, PROMPTS } from '../services/groqService.js';
 
 export const medicineRouter = Router();
 
+const ensureArray = (val) => {
+  if (Array.isArray(val)) return val;
+  if (typeof val === 'string') return val.split(',').map(s => s.trim()).filter(Boolean);
+  return val ? [val] : [];
+};
+
 // ────────────────────────────────────────────────────────────
 // POST /api/medicine/scan — Full scan pipeline
 // Step 1: Google Vision OCR extracts raw text
@@ -70,10 +76,10 @@ DO NOT translate the brandName or genericName. They should remain in English.`;
       purpose: grokResult.whatItTreats || '',
       howToTake: grokResult.howToTake || '',
       sideEffects: {
-        common: grokResult.commonSideEffects || [],
-        serious: grokResult.seriousSideEffects || [],
+        common: ensureArray(grokResult.commonSideEffects),
+        serious: ensureArray(grokResult.seriousSideEffects),
       },
-      contraindications: grokResult.doNotTakeWith || [],
+      contraindications: ensureArray(grokResult.doNotTakeWith),
       interactions: (grokResult.interactions || []).map((i) => ({
         medicationName: i.medicine,
         severity: { minor: 1, moderate: 2, major: 4, contraindicated: 5 }[i.severity] || 2,
@@ -82,7 +88,7 @@ DO NOT translate the brandName or genericName. They should remain in English.`;
       })),
       expiryStatus: grokResult.isExpired ? 'expired' : grokResult.expiringSoon ? 'expiring_soon' : 'safe',
       warningLevel: grokResult.warningLevel || 'safe',
-      patientSpecificWarnings: grokResult.patientSpecificWarnings || [],
+      patientSpecificWarnings: ensureArray(grokResult.patientSpecificWarnings),
     };
 
     res.json({ success: true, data: normalizedResult });
@@ -142,10 +148,10 @@ DO NOT translate the brandName or genericName. They should remain in English.`;
       purpose: grokResult.whatItTreats || '',
       howToTake: grokResult.howToTake || '',
       sideEffects: {
-        common: grokResult.commonSideEffects || [],
-        serious: grokResult.seriousSideEffects || [],
+        common: ensureArray(grokResult.commonSideEffects),
+        serious: ensureArray(grokResult.seriousSideEffects),
       },
-      contraindications: grokResult.doNotTakeWith || [],
+      contraindications: ensureArray(grokResult.doNotTakeWith),
       interactions: (grokResult.interactions || []).map((i) => ({
         medicationName: i.medicine,
         severity: { minor: 1, moderate: 2, major: 4, contraindicated: 5 }[i.severity] || 2,
@@ -154,7 +160,7 @@ DO NOT translate the brandName or genericName. They should remain in English.`;
       })),
       expiryStatus: 'safe',
       warningLevel: grokResult.warningLevel || 'safe',
-      patientSpecificWarnings: grokResult.patientSpecificWarnings || [],
+      patientSpecificWarnings: ensureArray(grokResult.patientSpecificWarnings),
     };
 
     res.json({ success: true, data: normalizedResult });

@@ -13,7 +13,7 @@ import VoiceSettingsModal from './VoiceSettingsModal';
 
 export default function VoiceAssistantOverlay() {
   const { state, errorMessage, isContinuousMode, isMuted, setPreferences, clearTranscript } = useVoiceStore();
-  const { language } = useTranslation();
+  const { t, language } = useTranslation();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   // Sync language changes with the recognizer
@@ -33,13 +33,13 @@ export default function VoiceAssistantOverlay() {
 
   const getStatusText = () => {
     switch (state) {
-      case 'listening': return '🎙️ Listening...';
-      case 'processing': return '⚙️ Processing...';
-      case 'submitted': return '📤 Sending...';
-      case 'speaking': return '🔊 Speaking...';
-      case 'ai_speaking': return '🔊 Speaking...';
-      case 'error': return 'Error';
-      default: return 'Voice Assistant';
+      case 'listening': return `🎙️ ${t('voice.listening')}`;
+      case 'processing': return `⚙️ ${t('voice.processing')}`;
+      case 'submitted': return `📤 ${t('voice.sending')}`;
+      case 'speaking': return `🔊 ${t('voice.speaking')}`;
+      case 'ai_speaking': return `🔊 ${t('voice.speaking')}`;
+      case 'error': return t('voice.error');
+      default: return t('voice.assistant');
     }
   };
 

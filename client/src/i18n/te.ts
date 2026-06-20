@@ -43,8 +43,18 @@ const te: TranslationKeys = {
   'common.signIn': 'సైన్ ఇన్',
   'common.signUp': 'సైన్ అప్',
   'common.signOut': 'సైన్ అవుట్',
-  'common.skip': 'ప్రస్తుతానికి దాటవేయి',
-  'common.upload': 'అప్‌లోడ్',
+  'common.skip': 'ఇప్పుడే వదిలివేయండి',
+  'common.upload': 'అప్‌లోడ్ చేయండి',
+  'common.listen': 'వినండి',
+  'common.stop': 'ఆపండి',
+
+  // ── Voice ──
+  'voice.listening': 'వింటున్నది...',
+  'voice.processing': 'ప్రాసెస్ చేస్తోంది...',
+  'voice.sending': 'పంపిస్తున్నది...',
+  'voice.speaking': 'మాట్లాడుతున్నది...',
+  'voice.error': 'లోపం',
+  'voice.assistant': 'వాయిస్ అసిస్టెంట్',
 
   // ── Hero Section ──
   'hero.badge': 'భారతదేశం కోసం AI ఆరోగ్య సంరక్షణ',
@@ -191,7 +201,21 @@ const te: TranslationKeys = {
   'medicine.scanInstructions': 'మందుల స్ట్రిప్‌ను ఫ్రేమ్‌లో అమర్చండి',
   'medicine.voiceInput': 'లేదా మందు పేరు చెప్పండి',
   'medicine.reading': 'మందుల సమాచారం చదువుతోంది...',
-
+  'medicine.identity': 'మందు గుర్తింపు',
+  'medicine.manufacturer': 'తయారీదారు',
+  'medicine.expiry': 'గడువు',
+  'medicine.whatItsFor': 'దేని కోసం వాడతారు',
+  'medicine.howToTakeIt': 'ఎలా తీసుకోవాలి',
+  'medicine.seriousSeekHelp': 'తీవ్రమైనవి (సహాయం కోరండి)',
+  'medicine.doNotTakeWith': 'దీనితో తీసుకోకండి',
+  'medicine.interactionCheck': 'పరస్పర చర్య తనిఖీ',
+  'medicine.noConflicts': 'మీ ప్రస్తుత మందులతో ఎటువంటి సమస్యలు లేవు',
+  'medicine.setReminder': 'రీఫిల్ రిమైండర్ సెట్ చేయండి',
+  'medicine.severeInteraction': 'తీవ్రమైన మందుల పరస్పర చర్య గుర్తించబడింది',
+  'medicine.callDoctor': 'డాక్టర్‌కు కాల్ చేయండి',
+  'medicine.understandRisk': 'నాకు ప్రమాదం అర్థమైంది',
+  'medicine.interactionWarning': 'పరస్పర చర్య హెచ్చరిక',
+  'medicine.common': 'సాధారణం',
   // ── Emergency Care ──
   'emergency.title': 'అత్యవసర సంరక్షణ',
   'emergency.needHelp': 'తక్షణ సహాయం కావాలా?',

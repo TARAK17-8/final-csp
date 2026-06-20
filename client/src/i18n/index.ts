@@ -15,7 +15,7 @@ cache.set('en', en);
 
 // localStorage cache key
 const LS_KEY = 'samaramai_i18n_cache';
-const LS_VERSION = '2';
+const LS_VERSION = '3';
 
 /**
  * Load a language pack. Returns cached version if available,

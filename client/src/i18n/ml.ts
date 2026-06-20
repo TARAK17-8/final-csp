@@ -43,7 +43,16 @@ const ml: TranslationKeys = {
   'common.signIn': 'സൈൻ ഇൻ',
   'common.signUp': 'സൈൻ അപ്പ്',
   'common.signOut': 'സൈൻ ഔട്ട്',
+  'common.listen': 'കേൾക്കുക',
+  'common.stop': 'നിർത്തുക',
 
+  // ── Voice ──
+  'voice.listening': 'കേൾക്കുന്നു...',
+  'voice.processing': 'പ്രോസസ്സ് ചെയ്യുന്നു...',
+  'voice.sending': 'അയയ്ക്കുന്നു...',
+  'voice.speaking': 'സംസാരിക്കുന്നു...',
+  'voice.error': 'പിശക്',
+  'voice.assistant': 'വോയ്സ് അസിസ്റ്റന്റ്',
   // ── Hero Section ──
   'hero.badge': 'ഇന്ത്യയ്ക്കുള്ള AI ആരോഗ്യ സേവനം',
   'hero.headline1': 'ആരോഗ്യ',

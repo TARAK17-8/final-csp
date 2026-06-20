@@ -41,7 +41,16 @@ const ta: TranslationKeys = {
   'common.signIn': 'உள்நுழை',
   'common.signUp': 'பதிவு செய்',
   'common.signOut': 'வெளியேறு',
+  'common.listen': 'கேளுங்கள்',
+  'common.stop': 'நிறுத்து',
 
+  // ── Voice ──
+  'voice.listening': 'கேட்கிறது...',
+  'voice.processing': 'செயலாக்குகிறது...',
+  'voice.sending': 'அனுப்புகிறது...',
+  'voice.speaking': 'பேசுகிறது...',
+  'voice.error': 'பிழை',
+  'voice.assistant': 'குரல் உதவியாளர்',
   'hero.badge': 'இந்தியாவுக்கான AI சுகாதாரம்',
   'hero.headline1': 'சுகாதார',
   'hero.headline2': 'வழிகாட்டுதல் மற்றும்',

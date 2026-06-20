@@ -436,12 +436,10 @@ Return JSON only:
 Translate the given prescription text into the target language while following strict medical translation rules.
 
 TRANSLATION RULES (NON-NEGOTIABLE):
-- Medicine names MUST remain UNCHANGED (do not translate brand names or generic names)
-- Dosages MUST remain UNCHANGED (numbers, mg, ml, etc.)
-- Brand names MUST remain UNCHANGED
-- Numbers MUST remain UNCHANGED
-- Medical abbreviations may be translated into common understanding in the target language
-- Translate ONLY surrounding explanatory text, instructions, and general language
+- Medicine and Brand names MUST remain UNCHANGED (do not translate brand names or generic names)
+- ALL other text MUST be fully translated into the target language. This includes dosage units (e.g., translate 'cap' to capsule in target language), frequency (e.g., '3x a day'), duration (e.g., '7 days'), and all instructions.
+- Numbers should remain as digits, but the words around them MUST be translated.
+- Medical abbreviations MUST be converted into simple words in the target language.
 
 MEDICAL ABBREVIATION CONVERSION:
 OD = once daily, BD = twice daily, TDS = thrice daily, QID = four times daily,

@@ -166,10 +166,10 @@ export default function AIAssistantPage() {
   // ── Voice state label for UX feedback ──
   const getVoiceStatusLabel = () => {
     switch (voiceState) {
-      case 'listening': return '🎙️ Listening...';
-      case 'processing': return '⚙️ Processing...';
-      case 'submitted': return '📤 Sending...';
-      case 'ai_speaking': return '🔊 Speaking...';
+      case 'listening': return `🎙️ ${t('voice.listening')}`;
+      case 'processing': return `⚙️ ${t('voice.processing')}`;
+      case 'submitted': return `📤 ${t('voice.sending')}`;
+      case 'ai_speaking': return `🔊 ${t('voice.speaking')}`;
       default: return null;
     }
   };

@@ -14,6 +14,7 @@ import { useTranslation } from '@/hooks/useTranslation';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import VoiceAssistantOverlay from '@/components/shared/VoiceAssistantOverlay';
+import ErrorBoundary from '@/components/shared/ErrorBoundary';
 
 // Pages
 import LandingPage from '@/features/landing/LandingPage';
@@ -122,9 +123,11 @@ export default function App() {
     <QueryClientProvider client={queryClient}>
       <LanguageProvider>
         <ReactLenis root options={{ lerp: 0.07, duration: 1.4, smoothWheel: true }}>
-          <BrowserRouter>
-            <AppContent />
-          </BrowserRouter>
+          <ErrorBoundary>
+            <BrowserRouter>
+              <AppContent />
+            </BrowserRouter>
+          </ErrorBoundary>
         </ReactLenis>
       </LanguageProvider>
     </QueryClientProvider>

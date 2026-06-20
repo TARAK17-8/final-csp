@@ -5,5 +5,17 @@ dist/
 .DS_Store
 Thumbs.db
 *.log
+# Environments
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.development
+*.env
+
+# Firebase
 .firebase/
+deployment/firebase/.firebase/
+firebase-debug.log*/
 serviceAccountKey.json

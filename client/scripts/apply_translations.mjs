@@ -1,5 +1,9 @@
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const translations = {
   hi: {
@@ -469,7 +473,7 @@ const translations = {
   }
 };
 
-const basePath = 'c:\\\\CLAUDE CSP\\\\samaramai\\\\client\\\\src\\\\i18n';
+const basePath = path.resolve(__dirname, '../src/i18n');
 
 async function run() {
   for (const [lang, keys] of Object.entries(translations)) {

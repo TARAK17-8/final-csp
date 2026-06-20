@@ -280,7 +280,7 @@ export default function MedicineScannerPage() {
                 fontSize: '0.95rem',
                 opacity: voiceState === 'ai_speaking' ? 0.4 : 1,
               }}>
-                <Mic size={18} /> {voiceState === 'listening' ? '🎙️ Listening...' : t('medicine.voiceInput')}
+                <Mic size={18} /> {voiceState === 'listening' ? `🎙️ ${t('voice.listening')}` : t('medicine.voiceInput')}
               </button>
 
               {/* Live voice transcript */}
@@ -349,7 +349,7 @@ export default function MedicineScannerPage() {
               <div style={{ marginBottom: '0.75rem' }}>
                 <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.8rem', marginBottom: '0.5rem' }}>Common:</p>
                 <div className="flex flex-wrap gap-2">
-                  {results.sideEffects.common.map((e) => (
+                  {(results.sideEffects.common || []).map((e) => (
                     <span key={e} style={{ padding: '0.25rem 0.6rem', borderRadius: 'var(--radius-full)', background: 'rgba(255,255,255,0.05)', fontSize: '0.8rem', color: 'rgba(255,255,255,0.6)' }}>{e}</span>
                   ))}
                 </div>
@@ -357,7 +357,7 @@ export default function MedicineScannerPage() {
               <div>
                 <p style={{ color: 'var(--color-warning)', fontSize: '0.8rem', marginBottom: '0.5rem' }}>Serious (seek help):</p>
                 <div className="flex flex-wrap gap-2">
-                  {results.sideEffects.serious.map((e) => (
+                  {(results.sideEffects.serious || []).map((e) => (
                     <span key={e} style={{ padding: '0.25rem 0.6rem', borderRadius: 'var(--radius-full)', background: 'rgba(217,119,6,0.1)', fontSize: '0.8rem', color: 'var(--color-warning)' }}>{e}</span>
                   ))}
                 </div>
@@ -367,7 +367,7 @@ export default function MedicineScannerPage() {
             {/* Card 5 — Contraindications */}
             <ResultCard title="Do Not Take With" icon={<Shield size={18} />} color="var(--color-emergency)">
               <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                {results.contraindications.map((c) => (
+                {(results.contraindications || []).map((c) => (
                   <li key={c} className="flex items-start gap-2" style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.9rem' }}>
                     <span style={{ color: 'var(--color-emergency)' }}>✕</span> {c}
                   </li>
@@ -376,7 +376,7 @@ export default function MedicineScannerPage() {
             </ResultCard>
 
             {/* Card 6 — Interaction Check */}
-            {results.interactions.length === 0 ? (
+            {(!results.interactions || results.interactions.length === 0) ? (
               <ResultCard title="Interaction Check" icon={<CheckCircle2 size={18} />} color="var(--color-success)">
                 <div className="flex items-center gap-2">
                   <CheckCircle2 size={20} color="var(--color-success)" />
@@ -384,7 +384,7 @@ export default function MedicineScannerPage() {
                 </div>
               </ResultCard>
             ) : (
-              results.interactions.map((interaction) => (
+              (results.interactions || []).map((interaction) => (
                 <InteractionCard key={interaction.medicationName} interaction={interaction} />
               ))
             )}
@@ -401,7 +401,7 @@ export default function MedicineScannerPage() {
                   color: voiceState === 'ai_speaking' ? 'var(--color-teal-400)' : 'rgba(255,255,255,0.7)' 
                 }}
               >
-                <Volume2 size={16} /> {voiceState === 'ai_speaking' ? 'Stop' : 'Listen'}
+                <Volume2 size={16} /> {voiceState === 'ai_speaking' ? t('common.stop') : t('common.listen')}
               </button>
               <button className="btn-secondary" style={{ borderColor: 'rgba(255,255,255,0.15)', color: 'rgba(255,255,255,0.7)' }}><Share2 size={16} /></button>
             </motion.div>

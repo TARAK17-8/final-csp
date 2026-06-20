@@ -150,8 +150,10 @@ prescriptionTranslatorRouter.post('/translate', async (req, res) => {
       })),
       generalInstructions: translationResult.generalInstructions || null,
       followUpNote: translationResult.followUpNote || null,
-      confidence: cleanupResult.confidence || 'medium',
-      confidenceScore: cleanupResult.confidenceScore || 50,
+      confidence: (['high', 'medium', 'low'].includes((cleanupResult.confidence || '').toLowerCase()))
+        ? cleanupResult.confidence.toLowerCase()
+        : 'medium',
+      confidenceScore: typeof cleanupResult.confidenceScore === 'number' ? cleanupResult.confidenceScore : 50,
       unclearSections: cleanupResult.unclearSections || [],
       detectedLanguage: cleanupResult.detectedLanguage || 'Unknown',
       preservedElements: cleanupResult.preservedElements || {},
