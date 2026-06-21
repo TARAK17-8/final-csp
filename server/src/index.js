@@ -29,7 +29,13 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 
 // ── Security ──
-app.use(helmet());
+// Helmet configured for cross-origin API server:
+// - CSP disabled (not needed for API-only server)
+// - crossOriginResourcePolicy set to cross-origin (required for cross-origin fetch)
+app.use(helmet({
+  contentSecurityPolicy: false,
+  crossOriginResourcePolicy: { policy: 'cross-origin' },
+}));
 const allowedOrigins = [process.env.CLIENT_URL, 'https://samaramai.web.app', 'https://samaramai.netlify.app', 'https://smaramai.netlify.app', 'http://localhost:5173'].filter(Boolean);
 app.use(cors({
   origin: (origin, callback) => {
@@ -38,6 +44,8 @@ app.use(cors({
     return callback(new Error('CORS policy: origin not allowed'));
   },
   credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'x-target-language-name'],
 }));
 
 // ── Rate Limiting ──
