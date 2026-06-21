@@ -81,7 +81,7 @@ export default class ErrorBoundary extends Component<Props, State> {
               An unexpected error occurred. You can try again or go back to the home page.
             </p>
 
-            {process.env.NODE_ENV === 'development' && this.state.error && (
+            {import.meta.env.DEV && this.state.error && (
               <pre style={{
                 background: 'rgba(255,255,255,0.05)',
                 padding: '1rem',
