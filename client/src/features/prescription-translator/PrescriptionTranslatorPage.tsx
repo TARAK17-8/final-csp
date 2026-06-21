@@ -198,6 +198,10 @@ export default function PrescriptionTranslatorPage() {
     setErrorMsg(null);
 
     try {
+      if (voiceState === 'ai_speaking' || voiceState === 'ai_paused') {
+        speechSynthesizer.cancel();
+      }
+
       // Compress image
       const base64 = await compressImage(imagePreview);
 
@@ -494,7 +498,11 @@ export default function PrescriptionTranslatorPage() {
   // ── Listen ──
   const handleListen = useCallback(() => {
     if (voiceState === 'ai_speaking') {
-      speechSynthesizer.cancel();
+      speechSynthesizer.pause();
+      return;
+    }
+    if (voiceState === 'ai_paused') {
+      speechSynthesizer.resume();
       return;
     }
     if (!results) return;
@@ -518,6 +526,9 @@ export default function PrescriptionTranslatorPage() {
     setImagePreview(null);
     setResults(null);
     setErrorMsg(null);
+    if (voiceState === 'ai_speaking' || voiceState === 'ai_paused') {
+      speechSynthesizer.cancel();
+    }
     setProcessingStep(0);
     setCopied(false);
     setSaved(false);

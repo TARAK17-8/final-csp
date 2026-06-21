@@ -3,7 +3,7 @@
 // ═══════════════════════════════════════════════════════════════
 
 import { useEffect } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactLenis } from 'lenis/react';
 import { useAuthStore } from '@/stores/authStore';
@@ -43,21 +43,27 @@ const STANDALONE_ROUTES = ['/auth', '/onboarding', '/symptom-checker', '/medicin
 
 function AppContent() {
   const { initialize } = useAuthStore();
+  const location = useLocation();
 
   useEffect(() => {
     initialize();
   }, [initialize]);
 
+  // Scroll to top on route change
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
+
   // Determine if current path is standalone
-  const pathname = window.location.pathname;
-  const isStandalone = STANDALONE_ROUTES.some((r) => pathname.startsWith(r));
+  const isStandalone = STANDALONE_ROUTES.some((r) => location.pathname.startsWith(r));
 
   return (
     <>
-      {!isStandalone && <Navbar />}
-      <Routes>
-        {/* Landing */}
-        <Route path="/" element={<LandingPage />} />
+      <Navbar />
+      <div style={{ paddingTop: isStandalone ? '72px' : '0' }}>
+        <Routes>
+          {/* Landing */}
+          <Route path="/" element={<LandingPage />} />
 
         {/* Auth */}
         <Route path="/auth/login" element={<LoginPage />} />
@@ -80,6 +86,7 @@ function AppContent() {
         {/* Dashboard */}
         <Route path="/dashboard" element={<DashboardPlaceholder />} />
       </Routes>
+      </div>
       <VoiceAssistantOverlay />
       {!isStandalone && <Footer />}
     </>

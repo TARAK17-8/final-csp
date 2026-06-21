@@ -35,7 +35,7 @@ export const NAV_LINKS: { labelKey: TranslationKey; href: string }[] = [
   { labelKey: 'nav.features', href: '#features' },
   { labelKey: 'nav.safety', href: '#safety' },
   { labelKey: 'nav.languages', href: '#languages' },
-  { labelKey: 'nav.emergency', href: '#emergency' },
+  { labelKey: 'nav.emergency', href: '/emergency-care' },
 ];
 
 export const FEATURE_STRIP_ITEMS: { icon: string; labelKey: TranslationKey; href: string }[] = [

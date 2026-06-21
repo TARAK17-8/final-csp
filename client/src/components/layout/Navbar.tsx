@@ -38,9 +38,9 @@ export default function Navbar() {
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-          showGlassNav
-            ? 'glass-dark shadow-lg'
-            : 'bg-transparent'
+          !isLanding 
+            ? 'bg-[#0B1120] border-b border-white/5' 
+            : (isScrolled ? 'glass-dark shadow-lg' : 'bg-transparent')
         }`}
         style={{ padding: '0 clamp(1.5rem, 5vw, 4rem)' }}
       >
@@ -72,11 +72,12 @@ export default function Navbar() {
 
           {/* Desktop Nav Links */}
           <div className="hidden md:flex items-center gap-8">
-            {isLanding &&
-              NAV_LINKS.map((link) => (
+            {NAV_LINKS.map((link) => {
+              const href = (!isLanding && link.href.startsWith('#')) ? `/${link.href}` : link.href;
+              return (
                 <a
                   key={link.labelKey}
-                  href={link.href}
+                  href={href}
                   className="text-label relative group no-underline"
                   style={{
                     color: 'var(--color-text-inverse)',
@@ -96,7 +97,8 @@ export default function Navbar() {
                     }}
                   />
                 </a>
-              ))}
+              );
+            })}
           </div>
 
           {/* CTA + Hamburger */}
@@ -157,18 +159,21 @@ export default function Navbar() {
               animate="visible"
               className="flex flex-col items-center gap-8"
             >
-              {NAV_LINKS.map((link) => (
-                <motion.a
-                  key={link.labelKey}
-                  variants={fadeInUp}
-                  href={link.href}
-                  onClick={() => setIsMobileOpen(false)}
-                  className="text-display-md no-underline"
-                  style={{ color: 'var(--color-text-inverse)' }}
-                >
-                  {t(link.labelKey)}
-                </motion.a>
-              ))}
+              {NAV_LINKS.map((link) => {
+                const href = (!isLanding && link.href.startsWith('#')) ? `/${link.href}` : link.href;
+                return (
+                  <motion.a
+                    key={link.labelKey}
+                    variants={fadeInUp}
+                    href={href}
+                    onClick={() => setIsMobileOpen(false)}
+                    className="text-display-md no-underline"
+                    style={{ color: 'var(--color-text-inverse)' }}
+                  >
+                    {t(link.labelKey)}
+                  </motion.a>
+                );
+              })}
               <motion.div variants={fadeInUp}>
                 <Link
                   to="/auth/login"

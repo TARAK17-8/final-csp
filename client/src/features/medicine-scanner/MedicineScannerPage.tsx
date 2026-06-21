@@ -77,10 +77,13 @@ export default function MedicineScannerPage() {
   const processImage = async (base64: string) => {
     setStage('processing');
     setErrorMsg(null);
-    // Stop camera
+    // Stop camera and any ongoing speech
     if (videoRef.current?.srcObject) {
       (videoRef.current.srcObject as MediaStream).getTracks().forEach((t) => t.stop());
       setCameraActive(false);
+    }
+    if (voiceState === 'ai_speaking' || voiceState === 'ai_paused') {
+      speechSynthesizer.cancel();
     }
 
     try {
@@ -135,6 +138,9 @@ export default function MedicineScannerPage() {
       (videoRef.current.srcObject as MediaStream).getTracks().forEach((t) => t.stop());
       setCameraActive(false);
     }
+    if (voiceState === 'ai_speaking' || voiceState === 'ai_paused') {
+      speechSynthesizer.cancel();
+    }
 
     try {
       const response = await api.post('/medicine/lookup', { medicineName: name, language });
@@ -156,7 +162,11 @@ export default function MedicineScannerPage() {
 
   const handleListen = () => {
     if (voiceState === 'ai_speaking') {
-      speechSynthesizer.cancel();
+      speechSynthesizer.pause();
+      return;
+    }
+    if (voiceState === 'ai_paused') {
+      speechSynthesizer.resume();
       return;
     }
     if (!results) return;

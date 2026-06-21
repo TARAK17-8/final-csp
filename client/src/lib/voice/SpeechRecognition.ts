@@ -459,6 +459,7 @@ export class SpeechRecognitionService {
 
     if (this.recognition) {
       try {
+        this.isActive = true;
         this.recognition.start();
 
         // Safety timer: auto-stop after MAX_RECOGNITION_TIME_MS
@@ -470,6 +471,7 @@ export class SpeechRecognitionService {
 
         return;
       } catch (error) {
+        this.isActive = false;
         console.error('Failed to start native recognition:', error);
         // Fall through to fallback
       }
@@ -494,6 +496,17 @@ export class SpeechRecognitionService {
         if (store.state === 'listening') {
           store.setState('idle');
         }
+      }
+    } else if (this.recognition) {
+      try {
+        this.recognition.abort();
+      } catch {
+        // Ignore
+      }
+      this.isActive = false;
+      const store = useVoiceStore.getState();
+      if (store.state === 'listening') {
+        store.setState('idle');
       }
     }
 

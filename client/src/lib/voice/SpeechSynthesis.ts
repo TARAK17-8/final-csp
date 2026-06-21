@@ -95,9 +95,27 @@ class SpeechSynthesisService {
     });
   }
 
+  public pause() {
+    if (this.synth.speaking && !this.synth.paused) {
+      this.synth.pause();
+      useVoiceStore.getState().setState('ai_paused');
+    }
+  }
+
+  public resume() {
+    if (this.synth.paused) {
+      this.synth.resume();
+      useVoiceStore.getState().setState('ai_speaking');
+    }
+  }
+
   public cancel() {
-    if (this.synth.speaking) {
+    if (this.synth.speaking || this.synth.paused || this.synth.pending) {
       this.synth.cancel();
+    }
+    const state = useVoiceStore.getState();
+    if (state.state === 'ai_speaking' || state.state === 'ai_paused') {
+      state.setState('idle');
     }
   }
 }

@@ -4,7 +4,7 @@
 
 import { create } from 'zustand';
 
-export type VoiceState = 'idle' | 'listening' | 'processing' | 'submitted' | 'speaking' | 'ai_speaking' | 'error';
+export type VoiceState = 'idle' | 'listening' | 'processing' | 'submitted' | 'speaking' | 'ai_speaking' | 'ai_paused' | 'error';
 
 interface VoiceStore {
   state: VoiceState;

@@ -85,6 +85,13 @@ export default function HealthRecordsPage() {
   const [uploading, setUploading] = useState(false);
   const [uploadResult, setUploadResult] = useState<any>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [speakingRecordId, setSpeakingRecordId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (voiceState === 'idle') {
+      setSpeakingRecordId(null);
+    }
+  }, [voiceState]);
 
   // Load records from Firestore
   const loadRecords = useCallback(async () => {
@@ -144,13 +151,23 @@ export default function HealthRecordsPage() {
   };
 
   const handleListen = useCallback((record: HealthRecord) => {
-    if (voiceState === 'ai_speaking') {
-      speechSynthesizer.cancel();
-      return;
+    if (speakingRecordId === record.id) {
+      if (voiceState === 'ai_speaking') {
+        speechSynthesizer.pause();
+        return;
+      }
+      if (voiceState === 'ai_paused') {
+        speechSynthesizer.resume();
+        return;
+      }
     }
+    if (voiceState === 'ai_speaking' || voiceState === 'ai_paused') {
+      speechSynthesizer.cancel();
+    }
+    setSpeakingRecordId(record.id);
     const text = `${typeLabels[record.type]}. ${record.title}. ${record.summary ? record.summary : ''}`;
     speechSynthesizer.speak(text, language);
-  }, [voiceState, language]);
+  }, [voiceState, language, speakingRecordId]);
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -276,11 +293,19 @@ export default function HealthRecordsPage() {
               {uploadResult.generalInstructions && <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.85rem', marginTop: '0.5rem' }}>{uploadResult.generalInstructions}</p>}
               
               <button 
-                onClick={() => speechSynthesizer.speak(uploadResult.explanation || uploadResult.translatedText || '', language)} 
+                onClick={() => {
+                  if (speakingRecordId === 'upload') {
+                    if (voiceState === 'ai_speaking') return speechSynthesizer.pause();
+                    if (voiceState === 'ai_paused') return speechSynthesizer.resume();
+                  }
+                  if (voiceState === 'ai_speaking' || voiceState === 'ai_paused') speechSynthesizer.cancel();
+                  setSpeakingRecordId('upload');
+                  speechSynthesizer.speak(uploadResult.explanation || uploadResult.translatedText || '', language);
+                }} 
                 className="btn-secondary flex items-center justify-center gap-2" 
-                style={{ marginTop: '1rem', width: '100%', borderColor: voiceState === 'ai_speaking' ? 'var(--color-teal-400)' : 'rgba(255,255,255,0.15)', color: voiceState === 'ai_speaking' ? 'var(--color-teal-400)' : 'rgba(255,255,255,0.7)' }}
+                style={{ marginTop: '1rem', width: '100%', borderColor: speakingRecordId === 'upload' && voiceState === 'ai_speaking' ? 'var(--color-teal-400)' : 'rgba(255,255,255,0.15)', color: speakingRecordId === 'upload' && voiceState === 'ai_speaking' ? 'var(--color-teal-400)' : 'rgba(255,255,255,0.7)' }}
               >
-                <Volume2 size={16} /> {voiceState === 'ai_speaking' ? t('common.stop') : t('common.listen')}
+                <Volume2 size={16} /> {speakingRecordId === 'upload' && voiceState === 'ai_speaking' ? t('common.stop') : t('common.listen')}
               </button>
             </motion.div>
           )}
@@ -319,7 +344,7 @@ export default function HealthRecordsPage() {
                   {record.summary && <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.85rem' }}>{record.summary}</p>}
                 </div>
                 <div className="flex gap-1">
-                  <button onClick={(e) => { e.stopPropagation(); handleListen(record); }} style={{ width: 32, height: 32, borderRadius: 'var(--radius-sm)', background: 'rgba(255,255,255,0.05)', border: 'none', color: voiceState === 'ai_speaking' ? 'var(--color-teal-400)' : 'rgba(255,255,255,0.4)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Volume2 size={14} /></button>
+                  <button onClick={(e) => { e.stopPropagation(); handleListen(record); }} style={{ width: 32, height: 32, borderRadius: 'var(--radius-sm)', background: 'rgba(255,255,255,0.05)', border: 'none', color: speakingRecordId === record.id && voiceState === 'ai_speaking' ? 'var(--color-teal-400)' : 'rgba(255,255,255,0.4)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Volume2 size={14} /></button>
                   {record.imageUrl && (
                     <button onClick={(e) => { e.stopPropagation(); window.open(record.imageUrl, '_blank'); }} style={{ width: 32, height: 32, borderRadius: 'var(--radius-sm)', background: 'rgba(255,255,255,0.05)', border: 'none', color: 'rgba(255,255,255,0.4)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Eye size={14} /></button>
                   )}

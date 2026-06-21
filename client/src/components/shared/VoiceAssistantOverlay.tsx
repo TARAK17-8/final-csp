@@ -143,20 +143,22 @@ export default function VoiceAssistantOverlay() {
                   <Settings size={16} />
                 </button>
                 
-                {state === 'error' && (
-                  <button 
-                    onClick={() => useVoiceStore.getState().reset()}
-                    style={{
-                      background: 'none',
-                      color: 'rgba(255,255,255,0.5)',
-                      border: 'none',
-                      cursor: 'pointer',
-                      padding: '0.25rem'
-                    }}
-                  >
-                    <X size={16} />
-                  </button>
-                )}
+                <button 
+                  onClick={() => {
+                    speechRecognizer.stopListening();
+                    speechSynthesizer.cancel();
+                    useVoiceStore.getState().reset();
+                  }}
+                  style={{
+                    background: 'none',
+                    color: 'rgba(255,255,255,0.5)',
+                    border: 'none',
+                    cursor: 'pointer',
+                    padding: '0.25rem'
+                  }}
+                >
+                  <X size={16} />
+                </button>
               </div>
             </div>
             
