@@ -30,7 +30,7 @@ const PORT = process.env.PORT || 3001;
 
 // ── Security ──
 app.use(helmet());
-const allowedOrigins = [process.env.CLIENT_URL, 'https://samaramai.netlify.app', 'https://smaramai.netlify.app', 'http://localhost:5173'].filter(Boolean);
+const allowedOrigins = [process.env.CLIENT_URL, 'https://samaramai.web.app', 'https://samaramai.netlify.app', 'https://smaramai.netlify.app', 'http://localhost:5173'].filter(Boolean);
 app.use(cors({
   origin: (origin, callback) => {
     if (!origin) return callback(null, true);
@@ -112,19 +112,25 @@ app.use((err, _req, res, _next) => {
   });
 });
 
-// ── Start Server ──
+// ── Start Server / Export Function ──
+import { onRequest } from "firebase-functions/v2/https";
 const MODEL = process.env.GROQ_MODEL || 'llama-3.3-70b-versatile';
 
-app.listen(PORT, () => {
-  console.log(`
-  ╔══════════════════════════════════════════════════╗
-  ║  samaramAI API Server v2.1                      ║
-  ║  Intelligence: Groq AI (${MODEL})    ║
-  ║  Port: ${PORT}                                      ║
-  ║  Endpoints: 13                                  ║
-  ║  Health: http://localhost:${PORT}/api/health         ║
-  ╚══════════════════════════════════════════════════╝
-  `);
-});
+console.log(`
+╔══════════════════════════════════════════════════╗
+║  samaramAI API Server v2.1                      ║
+║  Intelligence: Groq AI (${MODEL})    ║
+║  Mode: Firebase Cloud Functions                 ║
+╚══════════════════════════════════════════════════╝
+`);
 
-export default app;
+export const api = onRequest({ region: 'us-central1' }, app);
+
+// ── Render / Local Express Server Start ──
+// If PORT is defined (e.g. on Render) or not in production, start listening.
+// This prevents the Node process from exiting immediately when deployed to Render.
+if (process.env.NODE_ENV !== 'production' || process.env.PORT || process.env.RENDER) {
+  app.listen(PORT, () => {
+    console.log(`Express server actively listening on port ${PORT}`);
+  });
+}
